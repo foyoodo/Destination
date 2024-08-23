@@ -25,20 +25,39 @@ public final class ViewTransition<
 
     let viewPresentation: Presentation
 
+    var context: Presentation.Context
+
     public init(
         destinationViewFactory: DestinationFactory,
-        viewPresentation: Presentation
+        viewPresentation: Presentation,
+        context: Presentation.Context
     ) {
         self.destinationViewFactory = destinationViewFactory
         self.viewPresentation = viewPresentation
+        self.context = context
     }
 
-    public func _performTransition(sourceView: Presentation.Source) {
+    func _performTransition(sourceView: Presentation.Source) {
         let destinationView = destinationViewFactory.createView()
-        viewPresentation.present(sourceView: sourceView, destinationView: destinationView)
+        viewPresentation.present(source: sourceView, destination: destinationView, transitionContext: context)
     }
 
     public func performTransition(sourceView: Presentation.Source) {
         _performTransition(sourceView: sourceView)
+    }
+}
+
+extension ViewTransition: Reversible where Presentation: Dismissible {
+
+    public func reverse(completion: ((_ reversible: Reversible) -> Void)? = nil) {
+        viewPresentation.dismiss(transitionContext: context) {
+            completion?(self)
+        }
+    }
+
+    @discardableResult
+    public func performTransition(sourceView: Presentation.Source) -> Reversible {
+        _performTransition(sourceView: sourceView)
+        return self
     }
 }

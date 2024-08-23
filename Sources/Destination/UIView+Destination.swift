@@ -13,13 +13,13 @@ public protocol DestinationCompatible {
 
 }
 
-extension DestinationCompatible where Self: UIView {
+extension DestinationCompatible where Self: ViewType {
 
     public var destination: Destination<Self> {
         if let destination = objc_getAssociatedObject(self, &destinationKey) as? Destination<Self> {
             return destination
         } else {
-            let destination = Destination(view: self)
+            let destination = Destination(self)
             objc_setAssociatedObject(self, &destinationKey, destination, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
             return destination
         }
@@ -27,3 +27,4 @@ extension DestinationCompatible where Self: UIView {
 }
 
 extension UIView: DestinationCompatible { }
+extension UIViewController: DestinationCompatible { }

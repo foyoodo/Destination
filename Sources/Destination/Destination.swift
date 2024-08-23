@@ -7,9 +7,9 @@
 
 import UIKit
 
-public final class Destination<Host: UIView> {
+public final class Destination<Host: ViewType> {
 
-    public private(set) var view: Host?
+    public private(set) weak var host: Host?
 
     var transition: (any ViewTransitionType)?
 
@@ -17,26 +17,8 @@ public final class Destination<Host: UIView> {
         transition as? (any Reversible)
     }
 
-    init(view: Host) {
-        self.view = view
-    }
-
-    public func transition<Container: UIView, Host>(container: Container) -> ViewTransition<DestinationViewFactory<Host>, ContainerPresentation<Container>> {
-        guard let host = view else {
-            preconditionFailure()
-        }
-        let presentation = ContainerPresentation(containerView: container)
-        let transition = ViewTransition(destinationViewFactory: DestinationViewFactory(host), viewPresentation: presentation)
-        return transition
-    }
-
-    public func transition<Container: UIView, Source: UIView>(from sourceView: Source, container: Container) {
-        guard let host = view else {
-            preconditionFailure()
-        }
-        let transition = transition(container: container)
-        transition.performTransition(sourceView: sourceView)
-        self.transition = ReversibleViewTransition(transition)
+    init(_ host: Host) {
+        self.host = host
     }
 
 //    public func transition(from sourceView: UIView, viewPresentation: AnyViewPresentation<UIView, UIView>) {
